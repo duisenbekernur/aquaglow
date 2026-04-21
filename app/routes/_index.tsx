@@ -1,13 +1,12 @@
 import {useLoaderData} from 'react-router';
 import type {Route} from './+types/_index';
 import {
-  getSelectedProductOptions,
   useOptimisticVariant,
   getAdjacentAndFirstAvailableVariants,
   useSelectedOptionInUrlParam,
 } from '@shopify/hydrogen';
 import {DEFAULT_FEATURED_PRODUCT_HANDLE} from '~/constants/brand';
-import {PRODUCT_QUERY} from '~/lib/product-storefront';
+import {loadProductByHandle} from '~/lib/load-product-by-request';
 import {HeroSection} from '~/components/landing/HeroSection';
 import {ProblemSection} from '~/components/landing/ProblemSection';
 import {SolutionSection} from '~/components/landing/SolutionSection';
@@ -35,12 +34,11 @@ export async function loader({context, request}: Route.LoaderArgs) {
     context.env.PUBLIC_FEATURED_PRODUCT_HANDLE?.trim() ||
     DEFAULT_FEATURED_PRODUCT_HANDLE;
 
-  const {product} = await context.storefront.query(PRODUCT_QUERY, {
-    variables: {
-      handle,
-      selectedOptions: getSelectedProductOptions(request),
-    },
-  });
+  const {product} = await loadProductByHandle(
+    context.storefront,
+    handle,
+    request,
+  );
 
   if (!product?.id) {
     return {

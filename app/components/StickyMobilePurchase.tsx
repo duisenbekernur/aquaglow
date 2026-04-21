@@ -1,5 +1,9 @@
 import {Money} from '@shopify/hydrogen';
 import type {MoneyV2} from '@shopify/hydrogen/storefront-api-types';
+import {useRouteLoaderData} from 'react-router';
+import {IconBagCheckout} from '~/components/icons';
+import type {RootLoader} from '~/root';
+import {uiT} from '~/lib/ui-i18n';
 
 type Props = {
   title: string;
@@ -17,6 +21,9 @@ export function StickyMobilePurchase({
   compareAtPrice,
   available,
 }: Props) {
+  const root = useRouteLoaderData<RootLoader>('root');
+  const lang = root?.language ?? 'EN';
+
   return (
     <div className="sticky-purchase" role="region" aria-label="Quick purchase">
       <div className="sticky-purchase__inner">
@@ -35,10 +42,13 @@ export function StickyMobilePurchase({
         </div>
         <a
           href="#purchase"
-          className="btn btn--primary sticky-purchase__cta"
+          className="btn btn--primary sticky-purchase__cta btn--with-icon"
           aria-disabled={!available}
         >
-          {available ? 'Get yours' : 'Unavailable'}
+          <IconBagCheckout size={20} />
+          <span>
+            {available ? uiT(lang, 'stickyShop') : uiT(lang, 'unavailable')}
+          </span>
         </a>
       </div>
     </div>

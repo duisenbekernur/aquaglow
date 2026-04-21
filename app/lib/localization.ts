@@ -1,15 +1,28 @@
-const COOKIE = 'localization_country';
+const COOKIE = 'aqua_lang';
 
-/** Buyer country for Storefront `@inContext` — drives currency/presentation where markets allow. */
-export function getBuyerCountryFromRequest(request: Request): string {
+export type StoreLanguage = 'EN' | 'ES' | 'DE';
+
+/** Storefront `LanguageCode` + UI copy — pricing stays USD via `country: US` in context. */
+export function getStoreLanguageFromRequest(request: Request): StoreLanguage {
   const cookie = request.headers.get('Cookie');
-  if (!cookie) return 'US';
+  if (!cookie) return 'EN';
   const match = cookie.match(new RegExp(`(?:^|; )${COOKIE}=([^;]+)`));
-  const raw = match?.[1]?.trim();
-  if (raw === 'DE' || raw === 'ES') return raw;
-  return 'US';
+  const raw = match?.[1]?.trim().toUpperCase();
+  if (raw === 'ES' || raw === 'DE') return raw;
+  return 'EN';
 }
 
-export function localizationCookieHeader(country: 'US' | 'DE' | 'ES'): string {
-  return `${COOKIE}=${country}; Path=/; Max-Age=31536000; SameSite=Lax`;
+export function storeLanguageCookieHeader(lang: StoreLanguage): string {
+  return `${COOKIE}=${lang}; Path=/; Max-Age=31536000; SameSite=Lax`;
+}
+
+export function storeLanguageToHtmlLang(lang: StoreLanguage): string {
+  switch (lang) {
+    case 'ES':
+      return 'es';
+    case 'DE':
+      return 'de';
+    default:
+      return 'en';
+  }
 }

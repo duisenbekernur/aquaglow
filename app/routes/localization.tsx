@@ -1,9 +1,12 @@
 import {redirect} from 'react-router';
 import type {Route} from './+types/localization';
-import {localizationCookieHeader} from '~/lib/localization';
+import {
+  storeLanguageCookieHeader,
+  type StoreLanguage,
+} from '~/lib/localization';
 
 /**
- * POST-only route: sets `localization_country` cookie (US | DE | ES) and redirects back.
+ * POST: sets `aqua_lang` (EN | ES | DE) and redirects back. Storefront stays USD (US).
  */
 export async function action({request}: Route.ActionArgs) {
   if (request.method !== 'POST') {
@@ -11,14 +14,14 @@ export async function action({request}: Route.ActionArgs) {
   }
 
   const formData = await request.formData();
-  const country = String(formData.get('country') ?? 'US');
+  const lang = String(formData.get('language') ?? 'EN').toUpperCase();
   const redirectTo = String(formData.get('redirectTo') ?? '/');
 
-  const safe =
-    country === 'DE' || country === 'ES' || country === 'US' ? country : 'US';
+  const safe: StoreLanguage =
+    lang === 'ES' || lang === 'DE' ? lang : 'EN';
 
   const headers = new Headers();
-  headers.append('Set-Cookie', localizationCookieHeader(safe));
+  headers.append('Set-Cookie', storeLanguageCookieHeader(safe));
 
   return redirect(redirectTo || '/', {headers});
 }

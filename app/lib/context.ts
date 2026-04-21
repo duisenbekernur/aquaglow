@@ -1,8 +1,8 @@
 import {createHydrogenContext} from '@shopify/hydrogen';
-import type {CountryCode} from '@shopify/hydrogen/storefront-api-types';
+import type {CountryCode, LanguageCode} from '@shopify/hydrogen/storefront-api-types';
 import {AppSession} from '~/lib/session';
 import {CART_QUERY_FRAGMENT} from '~/lib/fragments';
-import {getBuyerCountryFromRequest} from '~/lib/localization';
+import {getStoreLanguageFromRequest} from '~/lib/localization';
 
 // Define the additional context object
 const additionalContext = {
@@ -42,7 +42,9 @@ export async function createHydrogenRouterContext(
     AppSession.init(request, [env.SESSION_SECRET]),
   ]);
 
-  const country = getBuyerCountryFromRequest(request) as CountryCode;
+  const language = getStoreLanguageFromRequest(request) as LanguageCode;
+  /** USD pricing — storefront markets use US as buyer country. */
+  const country = 'US' as CountryCode;
 
   const hydrogenContext = createHydrogenContext(
     {
@@ -51,7 +53,7 @@ export async function createHydrogenRouterContext(
       cache,
       waitUntil,
       session,
-      i18n: {language: 'EN', country},
+      i18n: {language, country},
       cart: {
         queryFragment: CART_QUERY_FRAGMENT,
       },

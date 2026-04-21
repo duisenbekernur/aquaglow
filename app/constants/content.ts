@@ -103,45 +103,87 @@ export type ReviewCard = {
 
 export const REVIEWS: ReviewCard[] = [
   {
-    name: 'Leonie Weber',
-    location: 'Munich, Germany',
-    quote:
-      'My hair feels softer after 2 weeks and I use much less conditioner now.',
-    stars: 5,
-  },
-  {
-    name: 'Marc Sánchez',
-    location: 'Valencia, Spain',
-    quote:
-      'Installation took less than a minute and the water pressure feels better than before.',
-    stars: 5,
-  },
-  {
-    name: 'Hannah Krüger',
-    location: 'Hamburg, Germany',
-    quote:
-      'My skin felt less dry after a few showers. The spray is strong but not stinging.',
-    stars: 5,
-  },
-  {
-    name: 'Elena Vázquez',
-    location: 'Seville, Spain',
-    quote:
-      'We have very hard water here. This is the first shower head that actually changed how my hair rinses.',
-    stars: 4,
-  },
-  {
-    name: 'Timo Schneider',
+    name: 'Lena Hoffmann',
     location: 'Berlin, Germany',
     quote:
-      'Looks minimal on the wall, feels premium in the hand. Shipping was quick.',
+      'Honestly did not expect much but my hair has been so much softer since I started using this. I used to use a lot of conditioner and now I barely need it.',
+    stars: 5,
+  },
+  {
+    name: 'María González',
+    location: 'Valencia, Spain',
+    quote:
+      'My skin was always itchy after showering, especially in winter. After three weeks the difference is real — less dry and my hair sheds less in the brush.',
+    stars: 5,
+  },
+  {
+    name: 'Tobias Becker',
+    location: 'Hamburg, Germany',
+    quote:
+      'Super easy to install, maybe ninety seconds. The water pressure feels stronger than before, which I did not expect. My partner noticed my hair looked better before I said I changed anything.',
+    stars: 5,
+  },
+  {
+    name: 'Clara Weiss',
+    location: 'Munich, Germany',
+    quote:
+      'Very hard water where I live — my hair always felt rough after showering. After about two weeks it is noticeably softer and easier to manage.',
+    stars: 5,
+  },
+  {
+    name: 'David Schmitt',
+    location: 'Frankfurt, Germany',
+    quote:
+      'Installation was literally under a minute. The shower stream feels fuller than our old head. Worth it for the daily upgrade alone.',
     stars: 5,
   },
   {
     name: 'Lucía Fernández',
+    location: 'Madrid, Spain',
+    quote:
+      'I bought this because my skin was dry after every shower. It feels smoother now and less irritated, and my hair has a bit more shine.',
+    stars: 5,
+  },
+  {
+    name: 'Carlos Martínez',
     location: 'Barcelona, Spain',
     quote:
-      'I was skeptical, but the chlorine smell is noticeably reduced.',
+      'I was skeptical but it does what it says. My partner noticed my hair looked healthier after a few uses. Nice bonus that the rinse feels quicker.',
+    stars: 5,
+  },
+  {
+    name: 'Sophie Keller',
+    location: 'Stuttgart, Germany',
+    quote:
+      'I used to load on conditioner after every wash. Now I use much less and my hair still feels soft. Bigger difference than I expected.',
+    stars: 5,
+  },
+  {
+    name: 'Markus Vogel',
+    location: 'Berlin, Germany',
+    quote:
+      'For the price it feels like a small upgrade that makes the daily routine nicer. The water somehow feels cleaner going through the filter.',
+    stars: 5,
+  },
+  {
+    name: 'Elena Ruiz',
+    location: 'Valencia, Spain',
+    quote:
+      'Very easy to install and the build quality feels solid. After a few weeks my hair breaks less and feels stronger — I would buy it again.',
+    stars: 5,
+  },
+  {
+    name: 'Leonie Weber',
+    location: 'Cologne, Germany',
+    quote:
+      'Chlorine smell in our building is strong — this reduced it enough that I notice right away. Pressure is great too.',
+    stars: 4,
+  },
+  {
+    name: 'Marc Sánchez',
+    location: 'Seville, Spain',
+    quote:
+      'Fits our hose without drama. The spray is even across the face of the head and does not sting. Happy customer.',
     stars: 5,
   },
 ];

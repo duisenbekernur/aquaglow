@@ -16,6 +16,7 @@ import resetStyles from '~/styles/reset.css?url';
 import appStyles from '~/styles/app.css?url';
 import {FunnelLayout} from '~/components/FunnelLayout';
 import {AnalyticsScripts} from '~/components/AnalyticsScripts';
+import {storeLanguageToHtmlLang, type StoreLanguage} from '~/lib/localization';
 
 export type RootLoader = typeof loader;
 
@@ -42,7 +43,7 @@ export async function loader(args: Route.LoaderArgs) {
 
   return {
     cart: cart.get(),
-    buyerCountry: storefront.i18n.country,
+    language: storefront.i18n.language as StoreLanguage,
     publicStoreDomain: env.PUBLIC_STORE_DOMAIN,
     shop: getShopAnalytics({
       storefront,
@@ -67,8 +68,12 @@ export function Layout({children}: {children?: React.ReactNode}) {
   const nonce = useNonce();
   const data = useRouteLoaderData<RootLoader>('root');
 
+  const htmlLang = storeLanguageToHtmlLang(
+    (data?.language as StoreLanguage) ?? 'EN',
+  );
+
   return (
-    <html lang="en">
+    <html lang={htmlLang}>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -106,7 +111,7 @@ export default function App() {
       shop={data.shop}
       consent={data.consent}
     >
-      <FunnelLayout cart={data.cart} buyerCountry={data.buyerCountry}>
+      <FunnelLayout cart={data.cart} language={data.language}>
         <Outlet />
       </FunnelLayout>
     </Analytics.Provider>

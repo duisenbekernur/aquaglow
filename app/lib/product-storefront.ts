@@ -5,6 +5,7 @@
 export const PRODUCT_VARIANT_FRAGMENT = `#graphql
   fragment ProductVariant on ProductVariant {
     availableForSale
+    quantityAvailable
     compareAtPrice {
       amount
       currencyCode
@@ -84,6 +85,11 @@ export const PRODUCT_FRAGMENT = `#graphql
     }
     adjacentVariants(selectedOptions: $selectedOptions) {
       ...ProductVariant
+    }
+    variants(first: 50) {
+      nodes {
+        ...ProductVariant
+      }
     }
     seo {
       description

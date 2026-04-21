@@ -1,7 +1,6 @@
 import {useLoaderData} from 'react-router';
 import type {Route} from './+types/products.$handle';
 import {
-  getSelectedProductOptions,
   Analytics,
   useOptimisticVariant,
   getProductOptions,
@@ -12,12 +11,13 @@ import {
 import {ProductForm} from '~/components/ProductForm';
 import {ProductGallery} from '~/components/ProductGallery';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
-import {PRODUCT_QUERY} from '~/lib/product-storefront';
+import {loadProductByHandle} from '~/lib/load-product-by-request';
 import {TrustBadges} from '~/components/TrustBadges';
 import {ReviewGrid} from '~/components/landing/ReviewGrid';
 import {FAQAccordion} from '~/components/landing/FAQAccordion';
 import {productJsonLd, productMetaTags, siteTitle} from '~/seo/document';
 import {StickyMobilePurchase} from '~/components/StickyMobilePurchase';
+import {VariantBreakdown} from '~/components/VariantBreakdown';
 
 export const meta: Route.MetaFunction = ({data}) => {
   if (!data?.product || !data.requestUrl) {
@@ -48,14 +48,7 @@ export async function loader({context, params, request}: Route.LoaderArgs) {
     throw new Error('Expected product handle to be defined');
   }
 
-  const [{product}] = await Promise.all([
-    storefront.query(PRODUCT_QUERY, {
-      variables: {
-        handle,
-        selectedOptions: getSelectedProductOptions(request),
-      },
-    }),
-  ]);
+  const {product} = await loadProductByHandle(storefront, handle, request);
 
   if (!product?.id) {
     throw new Response(null, {status: 404});
@@ -136,6 +129,10 @@ export default function Product() {
           <ProductForm
             productOptions={productOptions}
             selectedVariant={selectedVariant}
+          />
+          <VariantBreakdown
+            product={product}
+            selectedVariantId={selectedVariant?.id}
           />
           {product.descriptionHtml ? (
             <div

@@ -110,6 +110,8 @@ Deploy with **Shopify Oxygen** (`shopify hydrogen deploy`) or any host that can 
 | Product GraphQL (images, variants, SEO) | `app/lib/product-storefront.ts` then `npm run codegen` |
 | Visual design tokens / layout | `app/styles/app.css` |
 | Analytics placeholders | `app/components/AnalyticsScripts.tsx`, `app/hooks/useMarketingPixels.ts`, root loader in `app/root.tsx` |
+| Header button / cart strings (EN / ES / DE) | `app/lib/ui-i18n.ts` |
+| Language cookie + Storefront `language` | `app/lib/localization.ts`, `app/lib/context.ts` (buyer **country** is always `US` → **USD** pricing) |
 
 ## Routes shipped
 
@@ -120,7 +122,7 @@ Deploy with **Shopify Oxygen** (`shopify hydrogen deploy`) or any host that can 
 | `/cart` | Line items, update/remove, checkout link |
 | `/policies/shipping`, `/policies/returns`, `/policies/privacy` | Static policy pages (edit HTML in constants) |
 | `/contact` | Mailto-based contact |
-| `POST /localization` | Sets `localization_country` cookie (`US` / `DE` / `ES`) for `@inContext` |
+| `POST /localization` | Sets `aqua_lang` cookie (`EN` / `ES` / `DE`) for Storefront `language` + UI copy; **currency stays USD** (`country: US`) |
 
 ## Notes
 

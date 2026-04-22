@@ -28,10 +28,16 @@ export function Aside({
   children,
   heading,
   type,
+  overlayClassName,
+  asideClassName,
 }: {
   children?: React.ReactNode;
   type: AsideType;
   heading: React.ReactNode;
+  /** Extra classes on the overlay root (e.g. funnel cart styling). */
+  overlayClassName?: string;
+  /** Extra classes on the `<aside>` panel. */
+  asideClassName?: string;
 }) {
   const {type: activeType, close} = useAside();
   const expanded = type === activeType;
@@ -53,15 +59,19 @@ export function Aside({
     return () => abortController.abort();
   }, [close, expanded]);
 
+  const overlayClass = ['overlay', expanded ? 'expanded' : '', overlayClassName ?? '']
+    .filter(Boolean)
+    .join(' ');
+
   return (
     <div
       aria-modal
-      className={`overlay ${expanded ? 'expanded' : ''}`}
+      className={overlayClass}
       role="dialog"
       aria-labelledby={id}
     >
       <button className="close-outside" onClick={close} />
-      <aside>
+      <aside className={asideClassName}>
         <header>
           <h3 id={id}>{heading}</h3>
           <button className="close reset" onClick={close} aria-label="Close">

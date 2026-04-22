@@ -38,7 +38,12 @@ function CartAside({
   language: StoreLanguage;
 }) {
   return (
-    <Aside type="cart" heading={uiT(language, 'yourCart')}>
+    <Aside
+      type="cart"
+      heading={uiT(language, 'yourCart')}
+      overlayClassName="overlay--funnel-cart"
+      asideClassName="aside-drawer aside-drawer--cart"
+    >
       <Suspense fallback={<p className="muted">{uiT(language, 'loadingCart')}</p>}>
         <Await resolve={cart}>
           {(resolved) => <CartMain cart={resolved} layout="aside" />}

@@ -1,12 +1,9 @@
 import {useLoaderData} from 'react-router';
 import type {Route} from './+types/_index';
-import {
-  useOptimisticVariant,
-  getAdjacentAndFirstAvailableVariants,
-  useSelectedOptionInUrlParam,
-} from '@shopify/hydrogen';
+import {useSelectedOptionInUrlParam} from '@shopify/hydrogen';
 import {DEFAULT_FEATURED_PRODUCT_HANDLE} from '~/constants/brand';
 import {loadProductByHandle} from '~/lib/load-product-by-request';
+import {useProductSelectedVariant} from '~/lib/use-product-selected-variant';
 import {HeroSection} from '~/components/landing/HeroSection';
 import {ProblemSection} from '~/components/landing/ProblemSection';
 import {SolutionSection} from '~/components/landing/SolutionSection';
@@ -59,12 +56,9 @@ export default function LandingPage() {
   const data = useLoaderData<typeof loader>();
   const product = data.product;
 
-  const selectedVariant = useOptimisticVariant(
-    product?.selectedOrFirstAvailableVariant,
-    product ? getAdjacentAndFirstAvailableVariants(product) : [],
-  );
+  const selectedVariant = useProductSelectedVariant(product);
 
-  useSelectedOptionInUrlParam(selectedVariant?.selectedOptions);
+  useSelectedOptionInUrlParam(selectedVariant?.selectedOptions ?? []);
 
   if (!product) {
     return (

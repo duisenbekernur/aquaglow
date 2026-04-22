@@ -1,9 +1,11 @@
 import {useOptimisticCart} from '@shopify/hydrogen';
-import {Link} from 'react-router';
+import {Link, useRouteLoaderData} from 'react-router';
 import type {CartApiQueryFragment} from 'storefrontapi.generated';
 import {useAside} from '~/components/Aside';
 import {CartLineItem, type CartLine} from '~/components/CartLineItem';
 import {CartSummary} from './CartSummary';
+import type {RootLoader} from '~/root';
+import {uiT} from '~/lib/ui-i18n';
 
 export type CartLayout = 'page' | 'aside';
 
@@ -23,8 +25,8 @@ function getLineItemChildrenMap(lines: CartLine[]): LineItemChildrenMap {
       children[parentId].push(line);
     }
     if ('lineComponents' in line) {
-      const children = getLineItemChildrenMap(line.lineComponents);
-      for (const [parentId, childIds] of Object.entries(children)) {
+      const nested = getLineItemChildrenMap(line.lineComponents);
+      for (const [parentId, childIds] of Object.entries(nested)) {
         if (!children[parentId]) children[parentId] = [];
         children[parentId].push(...childIds);
       }
@@ -32,37 +34,41 @@ function getLineItemChildrenMap(lines: CartLine[]): LineItemChildrenMap {
   }
   return children;
 }
+
 /**
- * The main cart component that displays the cart items and summary.
- * It is used by both the /cart route and the cart aside dialog.
+ * Cart line items + summary. Used on `/cart` and in the cart drawer.
  */
 export function CartMain({layout, cart: originalCart}: CartMainProps) {
-  // The useOptimisticCart hook applies pending actions to the cart
-  // so the user immediately sees feedback when they modify the cart.
   const cart = useOptimisticCart(originalCart);
 
   const linesCount = Boolean(cart?.lines?.nodes?.length || 0);
   const withDiscount =
     cart &&
     Boolean(cart?.discountCodes?.filter((code) => code.applicable)?.length);
-  const className = `cart-main ${withDiscount ? 'with-discount' : ''}`;
   const cartHasItems = cart?.totalQuantity ? cart.totalQuantity > 0 : false;
   const childrenMap = getLineItemChildrenMap(cart?.lines?.nodes ?? []);
 
+  const sectionClass = [
+    'cart-main',
+    `cart-main--${layout}`,
+    withDiscount ? 'with-discount' : '',
+  ]
+    .filter(Boolean)
+    .join(' ');
+
   return (
     <section
-      className={className}
+      className={sectionClass}
       aria-label={layout === 'page' ? 'Cart page' : 'Cart drawer'}
     >
-      <CartEmpty hidden={linesCount} layout={layout} />
-      <div className="cart-details">
-        <p id="cart-lines" className="sr-only">
-          Line items
-        </p>
-        <div>
+      <CartEmpty hidden={linesCount} />
+      <div className={`cart-shell cart-shell--${layout}`}>
+        <div className="cart-shell__lines">
+          <p id="cart-lines" className="sr-only">
+            Line items
+          </p>
           <ul aria-labelledby="cart-lines">
             {(cart?.lines?.nodes ?? []).map((line) => {
-              // we do not render non-parent lines at the root of the cart
               if (
                 'parentRelationship' in line &&
                 line.parentRelationship?.parent
@@ -80,29 +86,32 @@ export function CartMain({layout, cart: originalCart}: CartMainProps) {
             })}
           </ul>
         </div>
-        {cartHasItems && <CartSummary cart={cart} layout={layout} />}
+        {cartHasItems ? (
+          <div
+            className={
+              layout === 'aside'
+                ? 'cart-shell__summary cart-shell__summary--aside'
+                : 'cart-shell__summary'
+            }
+          >
+            <CartSummary cart={cart} layout={layout} />
+          </div>
+        ) : null}
       </div>
     </section>
   );
 }
 
-function CartEmpty({
-  hidden = false,
-}: {
-  hidden: boolean;
-  layout?: CartMainProps['layout'];
-}) {
+function CartEmpty({hidden = false}: {hidden: boolean}) {
   const {close} = useAside();
+  const root = useRouteLoaderData<RootLoader>('root');
+  const lang = root?.language ?? 'EN';
+
   return (
-    <div hidden={hidden}>
-      <br />
-      <p>
-        Looks like you haven&rsquo;t added anything yet, let&rsquo;s get you
-        started!
-      </p>
-      <br />
+    <div hidden={hidden} className="cart-empty-funnel">
+      <p>{uiT(lang, 'cartEmptyMessage')}</p>
       <Link to="/" onClick={close} prefetch="viewport">
-        Back to AquaGlow →
+        {uiT(lang, 'cartContinueShopping')}
       </Link>
     </div>
   );

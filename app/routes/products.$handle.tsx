@@ -1,13 +1,6 @@
 import {useLoaderData} from 'react-router';
 import type {Route} from './+types/products.$handle';
-import {
-  Analytics,
-  useOptimisticVariant,
-  getProductOptions,
-  getAdjacentAndFirstAvailableVariants,
-  useSelectedOptionInUrlParam,
-  Money,
-} from '@shopify/hydrogen';
+import {Analytics, getProductOptions, useSelectedOptionInUrlParam, Money} from '@shopify/hydrogen';
 import {ProductForm} from '~/components/ProductForm';
 import {ProductGallery} from '~/components/ProductGallery';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
@@ -18,6 +11,10 @@ import {FAQAccordion} from '~/components/landing/FAQAccordion';
 import {productJsonLd, productMetaTags, siteTitle} from '~/seo/document';
 import {StickyMobilePurchase} from '~/components/StickyMobilePurchase';
 import {VariantBreakdown} from '~/components/VariantBreakdown';
+import {
+  useProductSelectedVariant,
+  variantIsOfferedForSale,
+} from '~/lib/use-product-selected-variant';
 
 export const meta: Route.MetaFunction = ({data}) => {
   if (!data?.product || !data.requestUrl) {
@@ -34,7 +31,8 @@ export const meta: Route.MetaFunction = ({data}) => {
         featuredImageUrl: v?.image?.url ?? null,
         priceAmount: v?.price?.amount,
         currencyCode: v?.price?.currencyCode,
-        availability: v?.availableForSale ? 'InStock' : 'OutOfStock',
+        availability:
+          v && variantIsOfferedForSale(v) ? 'InStock' : 'OutOfStock',
       },
     }),
   ];
@@ -62,12 +60,9 @@ export async function loader({context, params, request}: Route.LoaderArgs) {
 export default function Product() {
   const {product, requestUrl} = useLoaderData<typeof loader>();
 
-  const selectedVariant = useOptimisticVariant(
-    product.selectedOrFirstAvailableVariant,
-    getAdjacentAndFirstAvailableVariants(product),
-  );
+  const selectedVariant = useProductSelectedVariant(product);
 
-  useSelectedOptionInUrlParam(selectedVariant?.selectedOptions);
+  useSelectedOptionInUrlParam(selectedVariant?.selectedOptions ?? []);
 
   const productOptions = getProductOptions({
     ...product,
@@ -88,9 +83,10 @@ export default function Product() {
       featuredImageUrl: selectedVariant?.image?.url ?? null,
       priceAmount: selectedVariant?.price?.amount,
       currencyCode: selectedVariant?.price?.currencyCode,
-      availability: selectedVariant?.availableForSale
-        ? 'InStock'
-        : 'OutOfStock',
+      availability:
+        selectedVariant && variantIsOfferedForSale(selectedVariant)
+          ? 'InStock'
+          : 'OutOfStock',
     },
   });
 
@@ -152,7 +148,9 @@ export default function Product() {
         title={product.title}
         price={selectedVariant?.price}
         compareAtPrice={selectedVariant?.compareAtPrice}
-        available={selectedVariant?.availableForSale ?? false}
+        available={
+          selectedVariant ? variantIsOfferedForSale(selectedVariant) : false
+        }
       />
 
       <Analytics.ProductView

@@ -78,6 +78,46 @@ const M = {
     ES: 'Imagen siguiente',
     DE: 'Nächstes Bild',
   },
+  cartEmptyMessage: {
+    EN: 'Your cart is empty — add the AquaGlow shower filter and enjoy softer water in days.',
+    ES: 'Tu carrito está vacío: añade el filtro de ducha AquaGlow.',
+    DE: 'Dein Warenkorb ist leer — leg AquaGlows Duschfilter hinzu.',
+  },
+  cartPageTitle: {
+    EN: 'Shopping cart',
+    ES: 'Carrito',
+    DE: 'Warenkorb',
+  },
+  cartSubtotalLabel: {
+    EN: 'Subtotal',
+    ES: 'Subtotal',
+    DE: 'Zwischensumme',
+  },
+  cartOrderSummary: {
+    EN: 'Order summary',
+    ES: 'Resumen del pedido',
+    DE: 'Bestellübersicht',
+  },
+  cartSecureCheckout: {
+    EN: 'Secure checkout',
+    ES: 'Pago seguro',
+    DE: 'Sicher zur Kasse',
+  },
+  cartContinueShopping: {
+    EN: 'Continue shopping',
+    ES: 'Seguir comprando',
+    DE: 'Weiter einkaufen',
+  },
+  cartEach: {
+    EN: 'ea.',
+    ES: 'c/u',
+    DE: 'Stk.',
+  },
+  cartRemoveLine: {
+    EN: 'Remove',
+    ES: 'Quitar',
+    DE: 'Entfernen',
+  },
 } as const;
 
 type Key = keyof typeof M;

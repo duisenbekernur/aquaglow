@@ -1,8 +1,16 @@
-import {useLoaderData, data, type HeadersFunction} from 'react-router';
+import {
+  useLoaderData,
+  useRouteLoaderData,
+  data,
+  type HeadersFunction,
+  Link,
+} from 'react-router';
 import type {Route} from './+types/cart';
 import type {CartQueryDataReturn} from '@shopify/hydrogen';
 import {CartForm} from '@shopify/hydrogen';
 import {CartMain} from '~/components/CartMain';
+import {uiT} from '~/lib/ui-i18n';
+import type {RootLoader} from '~/root';
 
 export const meta: Route.MetaFunction = () => {
   return [{title: 'Cart | AquaGlow'}];
@@ -107,11 +115,20 @@ export async function loader({context}: Route.LoaderArgs) {
 
 export default function Cart() {
   const cart = useLoaderData<typeof loader>();
+  const root = useRouteLoaderData<RootLoader>('root');
+  const lang = root?.language ?? 'EN';
 
   return (
-    <div className="cart">
-      <h1>Cart</h1>
-      <CartMain layout="page" cart={cart} />
+    <div className="cart-page">
+      <div className="cart-page__inner">
+        <header className="cart-page__header">
+          <h1 className="cart-page__title">{uiT(lang, 'cartPageTitle')}</h1>
+          <Link className="cart-page__back" to="/">
+            {uiT(lang, 'cartContinueShopping')}
+          </Link>
+        </header>
+        <CartMain layout="page" cart={cart} />
+      </div>
     </div>
   );
 }

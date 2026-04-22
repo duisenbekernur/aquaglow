@@ -10,6 +10,7 @@ import {useAside} from './Aside';
 import type {ProductFragment} from 'storefrontapi.generated';
 import type {RootLoader} from '~/root';
 import {uiT} from '~/lib/ui-i18n';
+import {variantIsOfferedForSale} from '~/lib/use-product-selected-variant';
 import {IconBagCheckout, IconCart} from '~/components/icons';
 
 export function ProductForm({
@@ -25,8 +26,12 @@ export function ProductForm({
   const root = useRouteLoaderData<RootLoader>('root');
   const lang = root?.language ?? 'EN';
 
+  const sellable = selectedVariant
+    ? variantIsOfferedForSale(selectedVariant)
+    : false;
+
   const lines =
-    selectedVariant && selectedVariant.availableForSale
+    selectedVariant && sellable
       ? [
           {
             merchandiseId: selectedVariant.id,
@@ -36,9 +41,7 @@ export function ProductForm({
         ]
       : [];
 
-  const canPurchase = Boolean(
-    selectedVariant?.availableForSale && selectedVariant?.id,
-  );
+  const canPurchase = Boolean(selectedVariant?.id && sellable);
 
   return (
     <div className="product-form" id="purchase">
@@ -68,11 +71,6 @@ export function ProductForm({
                   price &&
                   compare &&
                   Number(compare.amount) > Number(price.amount);
-                const stock =
-                  variant?.quantityAvailable == null
-                    ? null
-                    : variant.quantityAvailable;
-
                 const meta = (
                   <div className="product-options-item__meta">
                     {price ? (
@@ -85,9 +83,9 @@ export function ProductForm({
                         <Money data={compare} />
                       </span>
                     ) : null}
-                    {stock !== null ? (
+                    {exists && available ? (
                       <span className="product-options-item__stock muted">
-                        {stock} {uiT(lang, 'variantStock')}
+                        {uiT(lang, 'variantStock')}
                       </span>
                     ) : null}
                   </div>
@@ -181,9 +179,7 @@ export function ProductForm({
         >
           <IconCart size={20} />
           <span>
-            {selectedVariant?.availableForSale === false
-              ? uiT(lang, 'unavailable')
-              : uiT(lang, 'addToCart')}
+            {!sellable ? uiT(lang, 'unavailable') : uiT(lang, 'addToCart')}
           </span>
         </AddToCartButton>
 

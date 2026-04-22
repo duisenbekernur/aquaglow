@@ -4,15 +4,14 @@ import type {ProductFragment} from 'storefrontapi.generated';
 import {getVariantUrl} from '~/lib/variants';
 import type {RootLoader} from '~/root';
 import {uiT} from '~/lib/ui-i18n';
+import {variantIsOfferedForSale} from '~/lib/use-product-selected-variant';
 
 type Props = {
   product: ProductFragment;
   selectedVariantId?: string | null;
 };
 
-/**
- * Full variant list: title, USD price, compare-at, Shopify `quantityAvailable`, deep-link.
- */
+/** Full variant list: title, prices, compare-at, select link (qty needs Storefront inventory scope). */
 export function VariantBreakdown({product, selectedVariantId}: Props) {
   const location = useLocation();
   const root = useRouteLoaderData<RootLoader>('root');
@@ -33,8 +32,7 @@ export function VariantBreakdown({product, selectedVariantId}: Props) {
               <th scope="col">Option</th>
               <th scope="col">Price</th>
               <th scope="col">Compare at</th>
-              <th scope="col">{uiT(lang, 'variantStock')}</th>
-              <th scope="col"><span className="sr-only">Actions</span></th>
+              <th scope="col">{uiT(lang, 'variantSelect')}</th>
             </tr>
           </thead>
           <tbody>
@@ -48,10 +46,7 @@ export function VariantBreakdown({product, selectedVariantId}: Props) {
               const selected =
                 (selectedVariantId ?? product.selectedOrFirstAvailableVariant?.id) ===
                 variant.id;
-              const qty =
-                variant.quantityAvailable == null
-                  ? '—'
-                  : String(variant.quantityAvailable);
+              const sellable = variantIsOfferedForSale(variant);
               return (
                 <tr
                   key={variant.id}
@@ -73,9 +68,8 @@ export function VariantBreakdown({product, selectedVariantId}: Props) {
                       '—'
                     )}
                   </td>
-                  <td>{qty}</td>
                   <td>
-                    {variant.availableForSale ? (
+                    {sellable ? (
                       <Link className="btn btn--ghost btn--small" to={to} replace>
                         {uiT(lang, 'variantSelect')}
                       </Link>

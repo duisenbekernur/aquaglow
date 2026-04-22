@@ -2,16 +2,18 @@ import type {CartApiQueryFragment} from 'storefrontapi.generated';
 import type {CartLayout} from '~/components/CartMain';
 import {CartForm, Money, type OptimisticCart} from '@shopify/hydrogen';
 import {useEffect, useId, useRef, useState} from 'react';
-import {useFetcher} from 'react-router';
+import {useFetcher, useRouteLoaderData} from 'react-router';
+import type {RootLoader} from '~/root';
+import {uiT} from '~/lib/ui-i18n';
 
 type CartSummaryProps = {
   cart: OptimisticCart<CartApiQueryFragment | null>;
   layout: CartLayout;
 };
 
-export function CartSummary({cart, layout}: CartSummaryProps) {
-  const className =
-    layout === 'page' ? 'cart-summary-page' : 'cart-summary-aside';
+export function CartSummary({cart, layout: layoutProp}: CartSummaryProps) {
+  const root = useRouteLoaderData<RootLoader>('root');
+  const lang = root?.language ?? 'EN';
   const summaryId = useId();
   const discountsHeadingId = useId();
   const discountCodeInputId = useId();
@@ -19,15 +21,18 @@ export function CartSummary({cart, layout}: CartSummaryProps) {
   const giftCardInputId = useId();
 
   return (
-    <div aria-labelledby={summaryId} className={className}>
-      <h4 id={summaryId}>Totals</h4>
-      <dl role="group" className="cart-subtotal">
-        <dt>Subtotal</dt>
+    <div
+      aria-labelledby={summaryId}
+      className={`cart-summary-card${layoutProp === 'aside' ? ' cart-summary-card--aside' : ''}`}
+    >
+      <h4 id={summaryId}>{uiT(lang, 'cartOrderSummary')}</h4>
+      <dl role="presentation" className="cart-subtotal">
+        <dt>{uiT(lang, 'cartSubtotalLabel')}</dt>
         <dd>
           {cart?.cost?.subtotalAmount?.amount ? (
             <Money data={cart?.cost?.subtotalAmount} />
           ) : (
-            '-'
+            '—'
           )}
         </dd>
       </dl>
@@ -47,14 +52,24 @@ export function CartSummary({cart, layout}: CartSummaryProps) {
 }
 
 function CartCheckoutActions({checkoutUrl}: {checkoutUrl?: string}) {
+  const root = useRouteLoaderData<RootLoader>('root');
+  const lang = root?.language ?? 'EN';
+
   if (!checkoutUrl) return null;
 
   return (
-    <div>
-      <a href={checkoutUrl} target="_self">
-        <p>Continue to Checkout &rarr;</p>
+    <div className="cart-checkout-block">
+      <a
+        className="btn btn--primary cart-checkout-block__btn"
+        href={checkoutUrl}
+        rel="noreferrer"
+        target="_self"
+      >
+        {uiT(lang, 'cartSecureCheckout')}
       </a>
-      <br />
+      <p className="cart-checkout-block__hint muted">
+        Encrypted checkout · Shopify
+      </p>
     </div>
   );
 }
@@ -74,11 +89,12 @@ function CartDiscounts({
       ?.map(({code}) => code) || [];
 
   return (
-    <section aria-label="Discounts">
-      {/* Have existing discount, display it with a remove option */}
+    <section className="cart-promo" aria-label="Discounts">
       <dl hidden={!codes.length}>
         <div>
-          <dt id={discountsHeadingId}>Discounts</dt>
+          <dt id={discountsHeadingId} className="sr-only">
+            Discounts
+          </dt>
           <UpdateDiscountForm>
             <div
               className="cart-discount"
@@ -86,28 +102,25 @@ function CartDiscounts({
               aria-labelledby={discountsHeadingId}
             >
               <code>{codes?.join(', ')}</code>
-              &nbsp;
               <button type="submit" aria-label="Remove discount">
-                Remove
+                ×
               </button>
             </div>
           </UpdateDiscountForm>
         </div>
       </dl>
 
-      {/* Show an input to apply a discount */}
       <UpdateDiscountForm discountCodes={codes}>
-        <div>
+        <div className="cart-promo__row">
           <label htmlFor={discountCodeInputId} className="sr-only">
             Discount code
           </label>
           <input
             id={discountCodeInputId}
-            type="text"
             name="discountCode"
             placeholder="Discount code"
+            type="text"
           />
-          &nbsp;
           <button type="submit" aria-label="Apply discount code">
             Apply
           </button>
@@ -193,10 +206,12 @@ function CartGiftCard({
   };
 
   return (
-    <section aria-label="Gift cards">
+    <section className="cart-promo" aria-label="Gift cards">
       {giftCardCodes && giftCardCodes.length > 0 && (
         <dl>
-          <dt id={giftCardHeadingId}>Applied Gift Card(s)</dt>
+          <dt id={giftCardHeadingId} className="sr-only">
+            Applied Gift Card(s)
+          </dt>
           {giftCardCodes.map((giftCard) => (
             <dd key={giftCard.id} className="cart-discount">
               <RemoveGiftCardForm
@@ -221,18 +236,17 @@ function CartGiftCard({
       )}
 
       <AddGiftCardForm fetcherKey="gift-card-add">
-        <div>
+        <div className="cart-promo__row">
           <label htmlFor={giftCardInputId} className="sr-only">
             Gift card code
           </label>
           <input
             id={giftCardInputId}
-            type="text"
             name="giftCardCode"
             placeholder="Gift card code"
             ref={giftCardCodeInput}
+            type="text"
           />
-          &nbsp;
           <button
             type="submit"
             disabled={giftCardAddFetcher.state !== 'idle'}

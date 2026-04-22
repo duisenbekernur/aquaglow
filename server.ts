@@ -12,6 +12,27 @@ export default {
     executionContext: ExecutionContext,
   ): Promise<Response> {
     try {
+      const url = new URL(request.url);
+      /**
+       * Chrome DevTools probes this URL and expects JSON. If it hits the RR
+       * catch-all, the HTML 404/document body is parsed as JSON and MiniOxygen
+       * logs: Unexpected token '<', "<!doctype" ... is not valid JSON
+       */
+      if (
+        url.pathname === '/.well-known/appspecific/com.chrome.devtools.json'
+      ) {
+        return Response.json(
+          {},
+          {
+            status: 200,
+            headers: {
+              'Content-Type': 'application/json; charset=utf-8',
+              'Cache-Control': 'no-store',
+            },
+          },
+        );
+      }
+
       const hydrogenContext = await createHydrogenRouterContext(
         request,
         env,

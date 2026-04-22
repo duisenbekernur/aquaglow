@@ -68,7 +68,7 @@ function CartCheckoutActions({checkoutUrl}: {checkoutUrl?: string}) {
         {uiT(lang, 'cartSecureCheckout')}
       </a>
       <p className="cart-checkout-block__hint muted">
-        Encrypted checkout · Shopify
+        {uiT(lang, 'cartCheckoutHint')}
       </p>
     </div>
   );

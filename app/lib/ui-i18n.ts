@@ -103,6 +103,11 @@ const M = {
     ES: 'Pago seguro',
     DE: 'Sicher zur Kasse',
   },
+  cartCheckoutHint: {
+    EN: 'SSL-encrypted checkout',
+    ES: 'Pago cifrado SSL',
+    DE: 'SSL-verschlüsselte Kasse',
+  },
   cartContinueShopping: {
     EN: 'Continue shopping',
     ES: 'Seguir comprando',

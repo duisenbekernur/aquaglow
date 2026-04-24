@@ -9,10 +9,13 @@ function tiktokPixelBootstrap(sdkId: string) {
 }
 
 export function AnalyticsScripts({
+  nonce,
   ga4Id,
   metaPixelId,
   tiktokPixelId,
 }: {
+  /** Required for inline scripts under Hydrogen CSP (`script-src 'nonce-…'`). */
+  nonce?: string;
   ga4Id?: string;
   metaPixelId?: string;
   tiktokPixelId?: string;
@@ -27,6 +30,7 @@ export function AnalyticsScripts({
       ) : null}
       {tiktokPixelId ? (
         <script
+          nonce={nonce}
           dangerouslySetInnerHTML={{
             __html: tiktokPixelBootstrap(tiktokPixelId),
           }}
@@ -36,9 +40,11 @@ export function AnalyticsScripts({
         <>
           <script
             async
+            nonce={nonce}
             src={`https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(ga4Id)}`}
           />
           <script
+            nonce={nonce}
             dangerouslySetInnerHTML={{
               __html: `
                 window.dataLayer = window.dataLayer || [];

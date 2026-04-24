@@ -31,6 +31,13 @@ export default async function handleRequest(
       'https://www.google-analytics.com',
       'https://www.googletagmanager.com',
     ],
+    imgSrc: [
+      "'self'",
+      'https://cdn.shopify.com',
+      'https://shopify.com',
+      'https://analytics.tiktok.com',
+      'data:',
+    ],
   });
 
   const body = await renderToReadableStream(

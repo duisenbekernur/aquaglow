@@ -83,6 +83,7 @@ export function Layout({children}: {children?: React.ReactNode}) {
         <Links />
         {data?.analytics ? (
           <AnalyticsScripts
+            nonce={nonce}
             ga4Id={data.analytics.ga4Id}
             metaPixelId={data.analytics.metaPixelId}
             tiktokPixelId={data.analytics.tiktokPixelId}

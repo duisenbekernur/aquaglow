@@ -12,6 +12,10 @@ declare global {
     PUBLIC_GA4_MEASUREMENT_ID?: string;
     PUBLIC_META_PIXEL_ID?: string;
     PUBLIC_TIKTOK_PIXEL_ID?: string;
+    /** TikTok Events API access token (server-only; Events Manager → Pixel → Events API) */
+    TIKTOK_ACCESS_TOKEN?: string;
+    /** Paste test code from Events Manager → Test events (e.g. TEST03768); omit in production */
+    TIKTOK_TEST_EVENT_CODE?: string;
   }
 }
 

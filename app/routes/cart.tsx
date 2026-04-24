@@ -11,6 +11,10 @@ import {CartForm} from '@shopify/hydrogen';
 import {CartMain} from '~/components/CartMain';
 import {uiT} from '~/lib/ui-i18n';
 import type {RootLoader} from '~/root';
+import {
+  merchandiseIdsFromLinesInput,
+  sendTikTokServerAddToCart,
+} from '~/lib/tiktok-events-api.server';
 
 export const meta: Route.MetaFunction = () => {
   return [{title: 'Cart | AquaGlow'}];
@@ -20,6 +24,8 @@ export const headers: HeadersFunction = ({actionHeaders}) => actionHeaders;
 
 export async function action({request, context}: Route.ActionArgs) {
   const {cart} = context;
+  const waitUntil = (context as {waitUntil?: (p: Promise<unknown>) => void})
+    .waitUntil;
 
   const formData = await request.formData();
 
@@ -31,9 +37,11 @@ export async function action({request, context}: Route.ActionArgs) {
 
   let status = 200;
   let result: CartQueryDataReturn;
+  let linesAddMerchandiseIds: string[] | undefined;
 
   switch (action) {
     case CartForm.ACTIONS.LinesAdd:
+      linesAddMerchandiseIds = merchandiseIdsFromLinesInput(inputs.lines);
       result = await cart.addLines(inputs.lines);
       break;
     case CartForm.ACTIONS.LinesUpdate:
@@ -84,6 +92,21 @@ export async function action({request, context}: Route.ActionArgs) {
   const cartId = result?.cart?.id;
   const headers = cartId ? cart.setCartId(result.cart.id) : new Headers();
   const {cart: cartResult, errors, warnings} = result;
+
+  if (
+    action === CartForm.ACTIONS.LinesAdd &&
+    linesAddMerchandiseIds?.length &&
+    cartResult &&
+    !(Array.isArray(errors) && errors.length > 0)
+  ) {
+    sendTikTokServerAddToCart({
+      env: context.env,
+      request,
+      cart: cartResult,
+      addedMerchandiseIds: linesAddMerchandiseIds,
+      waitUntil,
+    });
+  }
 
   const redirectTo = formData.get('redirectTo') ?? null;
   if (typeof redirectTo === 'string') {

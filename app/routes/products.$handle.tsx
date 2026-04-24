@@ -123,6 +123,7 @@ export default function Product() {
           </div>
           <TrustBadges />
           <ProductForm
+            product={product}
             productOptions={productOptions}
             selectedVariant={selectedVariant}
           />

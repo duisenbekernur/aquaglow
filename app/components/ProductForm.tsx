@@ -6,17 +6,21 @@ import type {
   ProductOptionValueSwatch,
 } from '@shopify/hydrogen/storefront-api-types';
 import {AddToCartButton} from './AddToCartButton';
+import {TikTokLinesAddTracker} from './TikTokLinesAddTracker';
 import {useAside} from './Aside';
 import type {ProductFragment} from 'storefrontapi.generated';
 import type {RootLoader} from '~/root';
 import {uiT} from '~/lib/ui-i18n';
 import {variantIsOfferedForSale} from '~/lib/use-product-selected-variant';
+import {shopifyGidToResourceId, type TikTokCartLineInput} from '~/lib/tiktok-pixel';
 import {IconBagCheckout, IconCart} from '~/components/icons';
 
 export function ProductForm({
+  product,
   productOptions,
   selectedVariant,
 }: {
+  product: Pick<ProductFragment, 'title'>;
   productOptions: MappedProductOptions[];
   selectedVariant: ProductFragment['selectedOrFirstAvailableVariant'];
 }) {
@@ -42,6 +46,18 @@ export function ProductForm({
       : [];
 
   const canPurchase = Boolean(selectedVariant?.id && sellable);
+
+  const tiktokLine: TikTokCartLineInput | undefined =
+    selectedVariant && sellable
+      ? {
+          contentId: shopifyGidToResourceId(selectedVariant.id),
+          contentName: product.title,
+          quantity,
+          value:
+            Number(selectedVariant.price.amount) * Math.max(1, quantity),
+          currency: selectedVariant.price.currencyCode,
+        }
+      : undefined;
 
   return (
     <div className="product-form" id="purchase">
@@ -176,6 +192,7 @@ export function ProductForm({
             open('cart');
           }}
           lines={lines}
+          tiktokLine={tiktokLine}
         >
           <IconCart size={20} />
           <span>
@@ -189,7 +206,7 @@ export function ProductForm({
           inputs={{lines}}
         >
           {(fetcher) => (
-            <>
+            <TikTokLinesAddTracker fetcher={fetcher} line={tiktokLine}>
               <input type="hidden" name="redirectTo" value="CHECKOUT" />
               <button
                 type="submit"
@@ -199,7 +216,7 @@ export function ProductForm({
                 <IconBagCheckout size={20} />
                 <span>{uiT(lang, 'buyNow')}</span>
               </button>
-            </>
+            </TikTokLinesAddTracker>
           )}
         </CartForm>
       </div>

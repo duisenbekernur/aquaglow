@@ -19,6 +19,18 @@ export default async function handleRequest(
       checkoutDomain: context.env.PUBLIC_CHECKOUT_DOMAIN,
       storeDomain: context.env.PUBLIC_STORE_DOMAIN,
     },
+    scriptSrc: [
+      "'self'",
+      'https://cdn.shopify.com',
+      'https://shopify.com',
+      'https://www.googletagmanager.com',
+      'https://analytics.tiktok.com',
+    ],
+    connectSrc: [
+      'https://analytics.tiktok.com',
+      'https://www.google-analytics.com',
+      'https://www.googletagmanager.com',
+    ],
   });
 
   const body = await renderToReadableStream(
